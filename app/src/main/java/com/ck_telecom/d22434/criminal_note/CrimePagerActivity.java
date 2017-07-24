@@ -20,11 +20,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 import java.util.UUID;
 
-public class CrimePagerActivity extends AppCompatActivity {
+public class CrimePagerActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     public static final String EXTRA_CRIME_ID =
@@ -32,7 +33,10 @@ public class CrimePagerActivity extends AppCompatActivity {
 
 
     private ViewPager mViewPager;
+    private FloatingActionButton mJumpFirst, mJumpLast;
     private List<Crime> mCrimes;
+
+    private int curItem;
 
     public static Intent newIntent(Context packageContext, UUID crimeId) {
         Intent intent = new Intent(packageContext, CrimePagerActivity.class);
@@ -50,6 +54,11 @@ public class CrimePagerActivity extends AppCompatActivity {
         mCrimes = CrimeLab.get(this).getmCrimes();
         FragmentManager fragmentManager = getSupportFragmentManager();
 
+        mJumpFirst = (FloatingActionButton) findViewById(R.id.jump_first);
+        mJumpLast = (FloatingActionButton) findViewById(R.id.jump_last);
+        mJumpFirst.setOnClickListener(this);
+        mJumpLast.setOnClickListener(this);
+
         mViewPager = (ViewPager) findViewById(R.id.activity_crime_pager_view_pager);
         mViewPager.setAdapter(new FragmentStatePagerAdapter(fragmentManager) {
             @Override
@@ -66,6 +75,18 @@ public class CrimePagerActivity extends AppCompatActivity {
 
         for (int i = 0; i < mCrimes.size(); i++) {
             if (mCrimes.get(i).equals(crimeId)) {
+                if (i == 0) {
+                    mJumpFirst.setEnabled(false);
+                } else {
+                    mJumpFirst.setEnabled(true);
+                }
+
+                if (i == mCrimes.size() - 1) {
+                    mJumpLast.setEnabled(false);
+                } else {
+                    mJumpLast.setEnabled(true);
+                }
+
                 mViewPager.setCurrentItem(i);
                 break;
             }
@@ -74,4 +95,17 @@ public class CrimePagerActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.jump_first:
+                mViewPager.setCurrentItem(0);
+                Toast.makeText(CrimePagerActivity.this, "the first one", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.jump_last:
+                mViewPager.setCurrentItem(mCrimes.size() - 1);
+                Toast.makeText(CrimePagerActivity.this, "the last one", Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
 }
