@@ -41,4 +41,8 @@ public class Crime {
     public void setSolved(boolean solved) {
         this.mSolved = solved;
     }
+
+    public void setmDate(Date mDate) {
+        this.mDate = mDate;
+    }
 }
