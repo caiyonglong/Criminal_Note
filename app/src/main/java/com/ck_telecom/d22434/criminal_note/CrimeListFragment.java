@@ -27,6 +27,9 @@ public class CrimeListFragment extends Fragment {
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
 
+    private int positionClicked;
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -72,6 +75,7 @@ public class CrimeListFragment extends Fragment {
             //change to Viewpager
 //            Intent intent = CrimeActivity.newIntent(getContext(), mCrime.getId());
             Intent intent = CrimePagerActivity.newIntent(getContext(), mCrime.getId());
+            positionClicked = getAdapterPosition();
             startActivity(intent);
         }
     }
@@ -120,7 +124,9 @@ public class CrimeListFragment extends Fragment {
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
         } else {
-            mAdapter.notifyDataSetChanged();
+//            mAdapter.notifyDataSetChanged();
+            mAdapter.notifyItemChanged(positionClicked);
+
         }
     }
 }
