@@ -16,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import com.ck_telecom.d22434.criminal_note.db.CrimeLab;
 import com.ck_telecom.d22434.criminal_note.utils.TimeUtil;
 
 import java.util.Date;
@@ -133,5 +134,13 @@ public class CrimeFragment extends Fragment {
 //        mDateButton.setText(mCrime.getDate().toString());
         //格式化日期
         mDateButton.setText(TimeUtil.TimeFormat(mCrime.getDate()));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //数据刷新
+        CrimeLab.get(getActivity())
+                .updateCrime(mCrime);
     }
 }
