@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ck_telecom.d22434.criminal_note.utils.TimeUtil;
+
 import java.util.List;
 
 /**
@@ -58,7 +60,9 @@ public class CrimeListFragment extends Fragment {
         public void bind(Crime crime) {
             mCrime = crime;
             mTitleTextView.setText(crime.getTitle());
-            mDateTextView.setText(crime.getDate().toString());
+//            mDateTextView.setText(crime.getDate().toString());
+            //格式化日期
+            mDateTextView.setText(TimeUtil.TimeFormat(crime.getDate()));
             mSovledImageView.setVisibility(crime.isSolved() ? View.VISIBLE : View.INVISIBLE);
         }
 

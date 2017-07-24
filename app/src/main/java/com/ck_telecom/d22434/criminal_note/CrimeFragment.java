@@ -16,6 +16,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import com.ck_telecom.d22434.criminal_note.utils.TimeUtil;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -128,6 +130,8 @@ public class CrimeFragment extends Fragment {
     }
 
     private void updateDate() {
-        mDateButton.setText(mCrime.getDate().toString());
+//        mDateButton.setText(mCrime.getDate().toString());
+        //格式化日期
+        mDateButton.setText(TimeUtil.TimeFormat(mCrime.getDate()));
     }
 }
