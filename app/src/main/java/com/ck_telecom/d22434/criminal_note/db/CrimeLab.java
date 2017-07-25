@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.ck_telecom.d22434.criminal_note.Crime;
 import com.ck_telecom.d22434.criminal_note.db.CrimeDbSchema.CrimeTable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -80,6 +81,7 @@ public class CrimeLab {
 
     /**
      * 删除记录
+     *
      * @param crime
      */
     public void deleteCrime(Crime crime) {
@@ -131,5 +133,9 @@ public class CrimeLab {
         return values;
     }
 
+    public File getPhotoFile(Crime crime) {
+        File filesDir = mContext.getFilesDir();
+        return new File(filesDir, crime.getPhotoFilename());
+    }
 
 }

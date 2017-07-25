@@ -4,10 +4,13 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -15,6 +18,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -28,12 +32,17 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.ck_telecom.d22434.criminal_note.db.CrimeLab;
+import com.ck_telecom.d22434.criminal_note.utils.PictureUtils;
 import com.ck_telecom.d22434.criminal_note.utils.TimeUtil;
 
+import java.io.File;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -45,17 +54,23 @@ public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 2;
+    private static final int MY_PERMISSIONS_REQUEST_CAMERA = 4;
 
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_CONTACT = 1;
+    private static final int REQUEST_PHOTO = 3;
 
     private Crime mCrime;
+    private File mPhotoFile;
+
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
     private Button mReportButton;
     private Button mSuspectButton;
     private Button mCallButton;
+    private ImageView mPhotoImageView;
+    private ImageButton mPhotoButton;
 
     /**
      * 新增 fragment argument
@@ -82,6 +97,8 @@ public class CrimeFragment extends Fragment {
         Log.d(ARG_CRIME_ID, crimeId.toString());
 
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
+        mPhotoFile = CrimeLab.get(getActivity()).getPhotoFile(mCrime);
+
     }
 
     @Nullable
@@ -114,6 +131,10 @@ public class CrimeFragment extends Fragment {
         mReportButton = (Button) v.findViewById(R.id.crime_report);
         mSuspectButton = (Button) v.findViewById(R.id.crime_suspect);
         mCallButton = (Button) v.findViewById(R.id.crime_call);
+        mPhotoImageView = (ImageView) v.findViewById(R.id.crime_photo);
+        mPhotoButton = (ImageButton) v.findViewById(R.id.crime_camera);
+
+
         updateDate();
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,14 +148,19 @@ public class CrimeFragment extends Fragment {
                 dialog.show(manager, DIALOG_DATE);
             }
         });
+        /**
+         * 联系人
+         */
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkPermission();
-
+                checkPermission(MY_PERMISSIONS_REQUEST_READ_CONTACTS);
             }
         });
 
+        /**
+         * 发送消息
+         */
         mReportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,6 +181,9 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        /**
+         * 打电话
+         */
         mCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,6 +193,9 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        /**
+         * 选择
+         */
         mSolvedCheckBox = (CheckBox) v.findViewById(R.id.crime_solved);
         mSolvedCheckBox.setChecked(mCrime.isSolved());
         mSolvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -182,6 +214,39 @@ public class CrimeFragment extends Fragment {
                 PackageManager.MATCH_DEFAULT_ONLY) == null) {
             mSuspectButton.setEnabled(false);
         }
+
+        mPhotoButton = (ImageButton) v.findViewById(R.id.crime_camera);
+        final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        boolean canTakePhoto = mPhotoFile != null
+                && captureImage.resolveActivity(packageManager) != null;
+
+        mPhotoButton.setEnabled(canTakePhoto);
+
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                checkPermission(MY_PERMISSIONS_REQUEST_CAMERA);
+
+                Uri uri = FileProvider.getUriForFile(getActivity(),
+                        "com.ck_telecom.d22434.criminal_note.fileprovider", mPhotoFile);
+                captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                List<ResolveInfo> cameraActivities = getActivity()
+                        .getPackageManager().queryIntentActivities(captureImage,
+                                PackageManager.MATCH_DEFAULT_ONLY);
+
+                for (ResolveInfo activity : cameraActivities) {
+                    getActivity().grantUriPermission(activity.activityInfo.packageName,
+                            uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    startActivityForResult(captureImage, REQUEST_PHOTO);
+                }
+            }
+        });
+
+        mPhotoImageView = (ImageView) v.findViewById(R.id.crime_photo);
+        updatePhotoView();
+
         return v;
     }
 
@@ -208,6 +273,13 @@ public class CrimeFragment extends Fragment {
             mCrime.setNumber(phone[1]);
             mSuspectButton.setText(phone[0]);
 
+        }
+        if (requestCode == REQUEST_PHOTO) {
+            Uri uri = FileProvider.getUriForFile(getActivity(),
+                    "com.ck_telecom.d22434.criminal_note.fileprovider", mPhotoFile);
+            getActivity().revokeUriPermission(uri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            updatePhotoView();
         }
     }
 
@@ -243,6 +315,15 @@ public class CrimeFragment extends Fragment {
                 mCrime.getTitle(), dateString, solvedString, suspect);
 
         return report;
+    }
+
+    private void updatePhotoView() {
+        if (mPhotoFile == null || !mPhotoFile.exists()) {
+            mPhotoImageView.setImageDrawable(null);
+        } else {
+            Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+            mPhotoImageView.setImageBitmap(bitmap);
+        }
     }
 
     @Override
@@ -318,20 +399,41 @@ public class CrimeFragment extends Fragment {
         return phoneContacts;
     }
 
-    //检测授权
-    private void checkPermission() {
+    /**
+     * 检测授权
+     *
+     * @param request
+     */
+    private void checkPermission(int request) {
+        switch (request) {
+            case MY_PERMISSIONS_REQUEST_READ_CONTACTS:
+                if (ContextCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.READ_CONTACTS)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.READ_CONTACTS},
+                            MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+                } else {
+                    Intent pickContact = new Intent(Intent.ACTION_PICK,
+                            ContactsContract.Contacts.CONTENT_URI);
+                    startActivityForResult(pickContact, REQUEST_CONTACT);
+                }
 
-        if (ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.READ_CONTACTS)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.READ_CONTACTS},
-                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-        } else {
-            Intent pickContact = new Intent(Intent.ACTION_PICK,
-                    ContactsContract.Contacts.CONTENT_URI);
-            startActivityForResult(pickContact, REQUEST_CONTACT);
+                break;
+
+            case MY_PERMISSIONS_REQUEST_CAMERA:
+
+                if (ContextCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.CAMERA},
+                            MY_PERMISSIONS_REQUEST_CAMERA);
+                }
+                break;
         }
+
+
     }
 
     @Override
@@ -345,9 +447,10 @@ public class CrimeFragment extends Fragment {
 
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    Intent pickContact = new Intent(Intent.ACTION_PICK,
-                            ContactsContract.Contacts.CONTENT_URI);
-                    startActivityForResult(pickContact, REQUEST_CONTACT);
+
+//                    Intent pickContact = new Intent(Intent.ACTION_PICK,
+//                            ContactsContract.Contacts.CONTENT_URI);
+//                    startActivityForResult(pickContact, REQUEST_CONTACT);
 
                 } else {
                     Toast.makeText(getActivity(), "授权被拒绝", Toast.LENGTH_SHORT).show();
@@ -356,6 +459,24 @@ public class CrimeFragment extends Fragment {
                 }
                 return;
             }
+            case MY_PERMISSIONS_REQUEST_CAMERA:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+//                    Intent pickContact = new Intent(Intent.ACTION_PICK,
+//                            ContactsContract.Contacts.CONTENT_URI);
+//                    startActivityForResult(pickContact, REQUEST_CONTACT);
+
+                } else {
+                    Toast.makeText(getActivity(), "授权被拒绝", Toast.LENGTH_SHORT).show();
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+
+                return;
         }
     }
 }
