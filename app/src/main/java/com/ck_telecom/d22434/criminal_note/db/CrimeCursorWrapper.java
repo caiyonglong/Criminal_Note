@@ -29,12 +29,14 @@ public class CrimeCursorWrapper extends CursorWrapper {
         long date = getLong(getColumnIndex(CrimeTable.Cols.DATE));
         int solved = getInt(getColumnIndex(CrimeTable.Cols.SOLVED));
         String suspect = getString(getColumnIndex(CrimeTable.Cols.SUSPECT));
+        String number = getString(getColumnIndex(CrimeTable.Cols.NUMBER));
 
         Crime crime = new Crime(UUID.fromString(uuid));
         crime.setTitle(title);
         crime.setmDate(new Date(date));
         crime.setSolved(solved != 0);
         crime.setSuspect(suspect);
+        crime.setNumber(number);
 
         return crime;
     }

@@ -1,5 +1,6 @@
 package com.ck_telecom.d22434.criminal_note;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -7,9 +8,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -23,6 +27,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.ck_telecom.d22434.criminal_note.db.CrimeLab;
 import com.ck_telecom.d22434.criminal_note.utils.TimeUtil;
@@ -38,6 +43,7 @@ public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 2;
 
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_CONTACT = 1;
@@ -48,6 +54,7 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mReportButton;
     private Button mSuspectButton;
+    private Button mCallButton;
 
     /**
      * 新增 fragment argument
@@ -105,6 +112,7 @@ public class CrimeFragment extends Fragment {
         mDateButton = (Button) v.findViewById(R.id.crime_date);
         mReportButton = (Button) v.findViewById(R.id.crime_report);
         mSuspectButton = (Button) v.findViewById(R.id.crime_suspect);
+        mCallButton = (Button) v.findViewById(R.id.crime_call);
         updateDate();
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,7 +129,8 @@ public class CrimeFragment extends Fragment {
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(pickContact, REQUEST_CONTACT);
+                checkPermission();
+
             }
         });
 
@@ -135,6 +144,15 @@ public class CrimeFragment extends Fragment {
                         getString(R.string.crime_report_subject));
                 i = Intent.createChooser(i, getString(R.string.send_report));
                 startActivity(i);
+            }
+        });
+
+        mCallButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri number = Uri.parse("tel:" + mCrime.getNumber());
+                Intent intent = new Intent(Intent.ACTION_DIAL, number);
+                startActivity(intent);
             }
         });
 
@@ -173,26 +191,14 @@ public class CrimeFragment extends Fragment {
         //查找手机联系人
         if (data != null && requestCode == REQUEST_CONTACT) {
             Uri contactUri = data.getData();
-            String[] queryFields = new String[]{
-                    ContactsContract.Contacts.DISPLAY_NAME,
-                    ContactsContract.Contacts._ID
-            };
-
-            Cursor c = getActivity().getContentResolver()
-                    .query(contactUri, queryFields, null, null, null);
-
-            try {
-                if (c.getCount() == 0) {
-                    return;
-                }
-
-                c.moveToFirst();
-                String suspect = c.getString(0);
-                mCrime.setSuspect(suspect);
-                mSuspectButton.setText(suspect);
-            } finally {
-                c.close();
+            String[] phone = getContacts(contactUri);
+            if (phone == null) {
+                Toast.makeText(getActivity(), "请选择有效的联系人！", Toast.LENGTH_SHORT).show();
+                return;
             }
+            mCrime.setSuspect(phone[0]);
+            mCrime.setNumber(phone[1]);
+            mSuspectButton.setText(phone[0]);
 
         }
     }
@@ -254,6 +260,94 @@ public class CrimeFragment extends Fragment {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * 获取联系人的姓名、联系电话
+     *
+     * @param contactUri
+     * @return
+     */
+    private String[] getContacts(Uri contactUri) {
+        String[] phoneContacts = new String[2];
+
+        String[] queryFields = new String[]{
+                ContactsContract.Contacts.DISPLAY_NAME,
+                ContactsContract.Contacts._ID
+        };
+
+        Cursor c = getActivity().getContentResolver()
+                .query(contactUri, queryFields, null, null, null);
+
+        try {
+            if (c.getCount() == 0) {
+                return null;
+            }
+            c.moveToFirst();
+            phoneContacts[0] = c.getString(0);
+            String contactId = c.getString(1);
+
+            Cursor phone = getActivity().getContentResolver()
+                    .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = "
+                                    + contactId, null, null);
+
+            if (phone.getCount() == 0) {
+                return null;
+            }
+            // 只取第一个数据
+            c.moveToFirst();
+            phone.moveToFirst();
+            String number = phone.getString(phone
+                    .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            phoneContacts[1] = number;
+        } catch (Exception e) {
+            return null;
+        } finally {
+            c.close();
+        }
+        return phoneContacts;
+    }
+
+    //检测授权
+    private void checkPermission() {
+
+        if (ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+        } else {
+            Intent pickContact = new Intent(Intent.ACTION_PICK,
+                    ContactsContract.Contacts.CONTENT_URI);
+            startActivityForResult(pickContact, REQUEST_CONTACT);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    Intent pickContact = new Intent(Intent.ACTION_PICK,
+                            ContactsContract.Contacts.CONTENT_URI);
+                    startActivityForResult(pickContact, REQUEST_CONTACT);
+
+                } else {
+                    Toast.makeText(getActivity(), "授权被拒绝", Toast.LENGTH_SHORT).show();
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
         }
     }
 }
