@@ -17,4 +17,5 @@
     </plurals>
     
     <string name="info_empty">新增 Crime</string>
+    <string name="crime_delete">删除本条记录</string>
 </resources>

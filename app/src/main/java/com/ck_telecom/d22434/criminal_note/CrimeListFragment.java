@@ -82,7 +82,7 @@ public class CrimeListFragment extends Fragment {
         }
 
         public void bind(Crime crime) {
-            mCrime = crime;
+            this.mCrime = crime;
             mTitleTextView.setText(crime.getTitle());
 //            mDateTextView.setText(crime.getDate().toString());
             //格式化日期
@@ -229,9 +229,9 @@ public class CrimeListFragment extends Fragment {
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
         } else {
-//            mAdapter.notifyDataSetChanged();
             mAdapter.setmCrimes(crimes);
-            mAdapter.notifyItemChanged(positionClicked);
+            mAdapter.notifyDataSetChanged();
+//            mAdapter.notifyItemChanged(positionClicked);
         }
 
         updateSubtitle();

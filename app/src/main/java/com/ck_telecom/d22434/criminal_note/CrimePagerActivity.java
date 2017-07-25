@@ -68,20 +68,20 @@ public class CrimePagerActivity extends AppCompatActivity implements View.OnClic
         });
 
         for (int i = 0; i < mCrimes.size(); i++) {
-            if (mCrimes.get(i).equals(crimeId)) {
+            if (mCrimes.get(i).getId().equals(crimeId)) {
+                mViewPager.setCurrentItem(i);
+
+                //初始化跳到第一条和最后一条
                 if (i == 0) {
                     mJumpFirst.setEnabled(false);
                 } else {
                     mJumpFirst.setEnabled(true);
                 }
-
                 if (i == mCrimes.size() - 1) {
                     mJumpLast.setEnabled(false);
                 } else {
                     mJumpLast.setEnabled(true);
                 }
-
-                mViewPager.setCurrentItem(i);
                 break;
             }
         }

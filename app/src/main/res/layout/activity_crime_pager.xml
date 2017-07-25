@@ -22,6 +22,7 @@
             android:layout_margin="8dp"
             android:background="@drawable/floatbutton"
             android:src="@drawable/ic_first_page"
+            app:backgroundTint="@color/state_no_press"
             app:elevation="8dp"
             app:pressedTranslationZ="16dp" />
 
@@ -32,6 +33,7 @@
             android:layout_margin="8dp"
             android:background="@drawable/floatbutton"
             android:src="@drawable/ic_last_page"
+            app:backgroundTint="@color/state_no_press"
             app:elevation="8dp"
             app:pressedTranslationZ="16dp" />
 

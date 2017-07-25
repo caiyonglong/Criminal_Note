@@ -19,7 +19,6 @@ import java.util.UUID;
 public class CrimeLab {
     private static CrimeLab sCrimeLab;
 
-    private List<Crime> mCrimes;
     private Context mContext;
     private SQLiteDatabase mDataBase;
 
@@ -33,14 +32,6 @@ public class CrimeLab {
     private CrimeLab(Context context) {
         mContext = context.getApplicationContext();
         mDataBase = new CrimeBaseHelper(mContext).getWritableDatabase();
-
-        mCrimes = new ArrayList<>();
-//        for (int i = 0; i < 100; i++) {
-//            Crime crime = new Crime();
-//            crime.setTitle("Crime #" + i);
-//            crime.setSolved(i % 2 == 0);
-//            mCrimes.add(crime);
-//        }
     }
 
     /**
@@ -53,9 +44,10 @@ public class CrimeLab {
         mDataBase.insert(CrimeTable.NAME, null, values);
     }
 
-    //返回crime列表
+    /**
+     * 返回crime列表
+     */
     public List<Crime> getmCrimes() {
-//        return mCrimes;
         List<Crime> crimes = new ArrayList<>();
         CrimeCursorWrapper cursor = queryCriems(null, null);
         try {
@@ -71,15 +63,10 @@ public class CrimeLab {
     }
 
     public Crime getCrime(UUID id) {
-//        for (Crime crime : mCrimes) {
-//            if (crime.getId().equals(id)) {
-//                return crime;
-//            }
-//        }
+
         CrimeCursorWrapper cursor = queryCriems(
                 CrimeTable.Cols.UUID + " = ?",
                 new String[]{id.toString()});
-
         try {
             if (cursor.getCount() == 0) {
                 return null;
@@ -90,6 +77,17 @@ public class CrimeLab {
             cursor.close();
         }
     }
+
+    /**
+     * 删除记录
+     * @param crime
+     */
+    public void deleteCrime(Crime crime) {
+        String uuidString = crime.getId().toString();
+        mDataBase.delete(CrimeTable.NAME,
+                CrimeTable.Cols.UUID + " = ?", new String[]{uuidString});
+    }
+
 
     /**
      * 更新记录
@@ -127,7 +125,7 @@ public class CrimeLab {
         ContentValues values = new ContentValues();
         values.put(CrimeTable.Cols.UUID, crime.getId().toString());
         values.put(CrimeTable.Cols.TITLE, crime.getTitle());
-        values.put(CrimeTable.Cols.DATE, crime.getDate().toString());
+        values.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
         values.put(CrimeTable.Cols.SOLVED, crime.isSolved() ? 1 : 0);
         return values;
     }

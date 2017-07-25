@@ -8,7 +8,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -56,12 +60,14 @@ public class CrimeFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 //        mCrime = new Crime();
 
 //        UUID crimeId = (UUID) getActivity().getIntent()
 //                .getSerializableExtra(CrimeActivity.EXTRA_CRIME_ID);
-
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
+        Log.d(ARG_CRIME_ID, crimeId.toString());
+
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
     }
 
@@ -142,5 +148,23 @@ public class CrimeFragment extends Fragment {
         //数据刷新
         CrimeLab.get(getActivity())
                 .updateCrime(mCrime);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_crime, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.delete_crime:
+                CrimeLab.get(getActivity()).deleteCrime(mCrime);
+                getActivity().finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
