@@ -1,4 +1,4 @@
-package com.ckt.criminal_note;
+package com.ckt.criminal_note.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -11,6 +11,8 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.DatePicker;
+
+import com.ckt.criminal_note.R;
 
 import java.util.Calendar;
 import java.util.Date;

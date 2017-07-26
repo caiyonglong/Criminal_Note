@@ -1,4 +1,4 @@
-package com.ckt.criminal_note;
+package com.ckt.criminal_note.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ckt.criminal_note.Crime;
+import com.ckt.criminal_note.CrimePagerActivity;
+import com.ckt.criminal_note.R;
 import com.ckt.criminal_note.db.CrimeLab;
 import com.ckt.criminal_note.utils.TimeUtil;
 

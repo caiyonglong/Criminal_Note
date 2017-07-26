@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 
+import com.ckt.criminal_note.fragment.CrimeFragment;
+
 import java.util.UUID;
 
 public class CrimeActivity extends SingleFragmentActivity {
