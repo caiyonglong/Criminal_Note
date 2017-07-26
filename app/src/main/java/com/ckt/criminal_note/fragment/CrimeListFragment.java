@@ -3,12 +3,15 @@ package com.ckt.criminal_note.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +28,7 @@ import com.ckt.criminal_note.R;
 import com.ckt.criminal_note.db.CrimeLab;
 import com.ckt.criminal_note.utils.TimeUtil;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,8 +38,10 @@ import java.util.List;
 public class CrimeListFragment extends Fragment {
 
     private static final String SAVED_SUBTITLE_VISIBLE = "subtitle";
+    private static final String ItemTouchHelper_TAG = "ItemTouchHelper";
 
     private Crime mCrime;
+    private List<Crime> crimes;
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
     private Button mEmptyView;
@@ -43,6 +49,7 @@ public class CrimeListFragment extends Fragment {
     private int positionClicked;
     private boolean mSubtitleVisible;
     private Callbacks mCallbacks;
+    ItemTouchHelper.Callback mITCallback;
 
     public interface Callbacks {
         void CrimeSelect(Crime crime);
@@ -74,6 +81,34 @@ public class CrimeListFragment extends Fragment {
         mCrimeRecyclerView = (RecyclerView) v.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        mITCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT) {
+
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                //拖动功能，
+                int fromx = viewHolder.getAdapterPosition();//初始时的位置
+                int tox = target.getAdapterPosition();//拖动后的位置
+
+                Collections.swap(crimes, fromx, tox);
+                mAdapter.notifyItemMoved(fromx, tox);
+                return true;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                //删除数据
+                CrimeLab.get(getActivity()).deleteCrime(crimes.get(position));
+                crimes.remove(position);
+                mAdapter.notifyItemRemoved(position);
+                updateUI();
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(mITCallback);
+
+        itemTouchHelper.attachToRecyclerView(mCrimeRecyclerView);
+
         mEmptyView = (Button) v.findViewById(R.id.empty_view);
 
 
@@ -100,7 +135,6 @@ public class CrimeListFragment extends Fragment {
             mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
             mSovledImageView = (ImageView) itemView.findViewById(R.id.crime_solved);
             itemView.setOnClickListener(this);
-
         }
 
         public void bind(Crime crime) {
@@ -235,7 +269,7 @@ public class CrimeListFragment extends Fragment {
      */
     public void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
-        List<Crime> crimes = crimeLab.getmCrimes();
+        crimes = crimeLab.getmCrimes();
 
         if (crimes.size() == 0) {
             mEmptyView.setVisibility(View.VISIBLE);
