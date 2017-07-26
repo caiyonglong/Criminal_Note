@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.ckt.criminal_note.utils.PictureUtils;
@@ -38,27 +39,20 @@ public class PhotoFragment extends DialogFragment {
         //加载布局
 //        View v = LayoutInflater.from(getActivity())
 //                .inflate(R.layout.di, null);
+
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bitmap bitmap = PictureUtils.getScaledBitmap(path, getActivity());
 
         ImageView mImageView = new ImageView(getActivity());
         mImageView.setScaleType(ImageView.ScaleType.FIT_XY);
         mImageView.setImageBitmap(bitmap);
-
-        return new AlertDialog.Builder(getActivity())
-                .setView(mImageView)
-                .setCancelable(true)
-                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        dialog.dismiss();
-                    }
-                })
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .create();
+        dialog.setView(mImageView);
+        mImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+        return dialog.create();
     }
 }

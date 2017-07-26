@@ -92,6 +92,7 @@ public class CrimeListFragment extends Fragment {
 
                 Collections.swap(crimes, fromx, tox);
                 mAdapter.notifyItemMoved(fromx, tox);
+                updateUI();
                 return true;
             }
 
@@ -101,8 +102,8 @@ public class CrimeListFragment extends Fragment {
                 //删除数据
                 CrimeLab.get(getActivity()).deleteCrime(crimes.get(position));
                 crimes.remove(position);
-                mAdapter.notifyItemRemoved(position);
                 updateUI();
+                mAdapter.notifyItemRemoved(position);
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(mITCallback);

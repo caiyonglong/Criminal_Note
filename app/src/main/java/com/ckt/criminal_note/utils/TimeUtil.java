@@ -1,6 +1,7 @@
 package com.ckt.criminal_note.utils;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -19,4 +20,12 @@ public class TimeUtil {
 
         return fullDateFormat.format(date);
     }
+
+    public static String TimeFormatToTime(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+//        DateFormat fullDateFormat = DateFormat.getDateInstance(DateFormat.AM_PM_FIELD);
+
+        return dateFormat.format(date);
+    }
+
 }
