@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">罪行笔记</string>
+    <string name="crime_title_hint">罪行简短描述</string>
+    <string name="crime_title_label">标题</string>
+    <string name="crime_details_label">明细</string>
+    <string name="crime_solved_label">是否解决</string>
+    <string name="date_picker_title">发生日期</string>
+
+    <string name="new_crime">新增罪行记录</string>
+    <string name="show_subtitle">显示子标题</string>
+    <string name="hide_subtitle">隐藏子标题</string>
+    <string name="subtitle_format">%1$d 条罪</string>
+
+    <plurals name="subtitle_plural">
+        <item quantity="one">%1$d 条罪</item>
+        <item quantity="other">%1$d 条罪</item>
+    </plurals>
+
+    <string name="info_empty">新增罪行记录</string>
+    <string name="crime_delete">删除</string>
+
+    <string name="crime_suspect_text">选择嫌疑人</string>
+    <string name="crime_report_text">抗议与投诉</string>
+
+    <string name="crime_report">%1$s! 罪发生于 %2$s. %3$s ,y %4$s</string>
+    <string name="crime_report_solved">问题已解决</string>
+    <string name="crime_report_unsolved">问题未解决</string>
+    <string name="crime_report_no_suspect">没有找到嫌疑人</string>
+    <string name="crime_report_suspect">嫌疑人是 %s.</string>
+    <string name="crime_report_subject">犯罪记录处理情况报告</string>
+    <string name="send_report">投诉方式</string>
+    <string name="crime_call_text">电话警告</string>
+
+
+</resources>

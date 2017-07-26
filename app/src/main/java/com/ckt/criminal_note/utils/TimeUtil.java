@@ -14,8 +14,8 @@ public class TimeUtil {
 //        SimpleDateFormat dateFormat =
 //                new SimpleDateFormat("yyyy年MM月dd日EE");
 
-        Locale locale = new Locale("en","US");
-        DateFormat fullDateFormat = DateFormat.getDateInstance(DateFormat.FULL, locale);
+//        Locale locale = new Locale("en","US");
+        DateFormat fullDateFormat = DateFormat.getDateInstance(DateFormat.FULL);
 
         return fullDateFormat.format(date);
     }
