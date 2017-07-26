@@ -2,6 +2,8 @@ package com.ckt.criminal_note;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class CrimePagerActivity extends AppCompatActivity
-        implements View.OnClickListener ,CrimeFragment.Callbacks{
+        implements View.OnClickListener, CrimeFragment.Callbacks {
 
 
     public static final String EXTRA_CRIME_ID =
@@ -69,21 +71,27 @@ public class CrimePagerActivity extends AppCompatActivity
             }
         });
 
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                updateJumpButton(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         for (int i = 0; i < mCrimes.size(); i++) {
             if (mCrimes.get(i).getId().equals(crimeId)) {
                 mViewPager.setCurrentItem(i);
-
-                //初始化跳到第一条和最后一条
-                if (i == 0) {
-                    mJumpFirst.setEnabled(false);
-                } else {
-                    mJumpFirst.setEnabled(true);
-                }
-                if (i == mCrimes.size() - 1) {
-                    mJumpLast.setEnabled(false);
-                } else {
-                    mJumpLast.setEnabled(true);
-                }
+                updateJumpButton(i);
                 break;
             }
         }
@@ -96,12 +104,31 @@ public class CrimePagerActivity extends AppCompatActivity
         switch (v.getId()) {
             case R.id.jump_first:
                 mViewPager.setCurrentItem(0);
-                Toast.makeText(CrimePagerActivity.this, "the first one", Toast.LENGTH_SHORT).show();
+                updateJumpButton(0);
                 break;
             case R.id.jump_last:
                 mViewPager.setCurrentItem(mCrimes.size() - 1);
-                Toast.makeText(CrimePagerActivity.this, "the last one", Toast.LENGTH_SHORT).show();
+                updateJumpButton(mCrimes.size() - 1);
                 break;
+        }
+    }
+
+    /**
+     * 更新跳转按钮
+     *
+     * @param position
+     */
+    private void updateJumpButton(int position) {
+
+        if (position == 0) {
+            mJumpFirst.hide();
+        } else {
+            mJumpFirst.show();
+        }
+        if (position == mCrimes.size() - 1) {
+            mJumpLast.hide();
+        } else {
+            mJumpLast.show();
         }
     }
 
