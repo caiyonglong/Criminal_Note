@@ -1,5 +1,7 @@
 package com.ckt.criminal_note.fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -40,6 +42,23 @@ public class CrimeListFragment extends Fragment {
 
     private int positionClicked;
     private boolean mSubtitleVisible;
+    private Callbacks mCallbacks;
+
+    public interface Callbacks {
+        void CrimeSelect(Crime crime);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -98,9 +117,11 @@ public class CrimeListFragment extends Fragment {
 //            Intent intent = new Intent(getContext(), CrimeActivity.class);
             //change to Viewpager
 //            Intent intent = CrimeActivity.newIntent(getContext(), mCrime.getId());
-            Intent intent = CrimePagerActivity.newIntent(getContext(), mCrime.getId());
-            positionClicked = getAdapterPosition();
-            startActivity(intent);
+            //第十七章注释掉
+//            Intent intent = CrimePagerActivity.newIntent(getContext(), mCrime.getId());
+//            startActivity(intent);
+            //回调
+            mCallbacks.CrimeSelect(mCrime);
         }
     }
 
@@ -212,7 +233,7 @@ public class CrimeListFragment extends Fragment {
     /**
      * 更新RecyclerView,显示最新状态
      */
-    private void updateUI() {
+    public void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getmCrimes();
 
@@ -243,8 +264,15 @@ public class CrimeListFragment extends Fragment {
     private void new_crime() {
         Crime crime = new Crime();
         CrimeLab.get(getActivity()).addCrime(crime);
-        Intent intent = CrimePagerActivity.newIntent(
-                getActivity(), crime.getId());
-        startActivity(intent);
+//        Intent intent = CrimePagerActivity.newIntent(
+//                getActivity(), crime.getId());
+//        startActivity(intent);
+        /**
+         * 调用回调新建crime
+         */
+        updateUI();
+        mCallbacks.CrimeSelect(crime);
+
     }
+
 }

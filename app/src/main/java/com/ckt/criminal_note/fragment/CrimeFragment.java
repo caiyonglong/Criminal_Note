@@ -2,6 +2,7 @@ package com.ckt.criminal_note.fragment;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -74,6 +75,24 @@ public class CrimeFragment extends Fragment {
     private Button mCallButton;
     private ImageView mPhotoImageView;
     private ImageButton mPhotoButton;
+    private Callbacks mCallbacks;
+
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
+
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     /**
      * 新增 fragment argument
@@ -120,11 +139,13 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mCrime.setTitle(s.toString());
+                updateCrime();
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 //This one too
+                updateCrime();
             }
         });
 
@@ -262,6 +283,7 @@ public class CrimeFragment extends Fragment {
             Date date = (Date) data
                     .getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setmDate(date);
+            updateCrime();
             updateDate();
         }
         //查找手机联系人
@@ -272,6 +294,7 @@ public class CrimeFragment extends Fragment {
                 Toast.makeText(getActivity(), "请选择有效的联系人！", Toast.LENGTH_SHORT).show();
                 return;
             }
+            updateCrime();
             mCrime.setSuspect(phone[0]);
             mCrime.setNumber(phone[1]);
             mSuspectButton.setText(phone[0]);
@@ -282,8 +305,14 @@ public class CrimeFragment extends Fragment {
                     "com.ckt.criminal_note.fileprovider", mPhotoFile);
             getActivity().revokeUriPermission(uri,
                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            updateCrime();
             updatePhotoView();
         }
+    }
+
+    private void updateCrime() {
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+        mCallbacks.onCrimeUpdated(mCrime);
     }
 
     private void updateDate() {

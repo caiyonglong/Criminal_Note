@@ -20,7 +20,8 @@ import com.ckt.criminal_note.fragment.CrimeFragment;
 import java.util.List;
 import java.util.UUID;
 
-public class CrimePagerActivity extends AppCompatActivity implements View.OnClickListener {
+public class CrimePagerActivity extends AppCompatActivity
+        implements View.OnClickListener ,CrimeFragment.Callbacks{
 
 
     public static final String EXTRA_CRIME_ID =
@@ -102,5 +103,10 @@ public class CrimePagerActivity extends AppCompatActivity implements View.OnClic
                 Toast.makeText(CrimePagerActivity.this, "the last one", Toast.LENGTH_SHORT).show();
                 break;
         }
+    }
+
+    @Override
+    public void onCrimeUpdated(Crime crime) {
+
     }
 }
