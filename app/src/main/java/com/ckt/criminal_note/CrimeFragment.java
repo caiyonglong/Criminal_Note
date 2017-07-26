@@ -1,4 +1,4 @@
-package com.ck_telecom.d22434.criminal_note;
+package com.ckt.criminal_note;
 
 import android.Manifest;
 import android.app.Activity;
@@ -36,9 +36,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.ck_telecom.d22434.criminal_note.db.CrimeLab;
-import com.ck_telecom.d22434.criminal_note.utils.PictureUtils;
-import com.ck_telecom.d22434.criminal_note.utils.TimeUtil;
+import com.ckt.criminal_note.db.CrimeLab;
+import com.ckt.criminal_note.utils.PictureUtils;
+import com.ckt.criminal_note.utils.TimeUtil;
 
 import java.io.File;
 import java.util.Date;

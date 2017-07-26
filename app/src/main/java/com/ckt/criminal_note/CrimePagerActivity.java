@@ -1,4 +1,4 @@
-package com.ck_telecom.d22434.criminal_note;
+package com.ckt.criminal_note;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +14,7 @@ import android.view.View;
 
 import android.widget.Toast;
 
-import com.ck_telecom.d22434.criminal_note.db.CrimeLab;
+import com.ckt.criminal_note.db.CrimeLab;
 
 import java.util.List;
 import java.util.UUID;

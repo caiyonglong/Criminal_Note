@@ -1,6 +1,4 @@
-package com.ck_telecom.d22434.criminal_note;
-
-import android.text.format.DateFormat;
+package com.ckt.criminal_note;
 
 import org.junit.Test;
 

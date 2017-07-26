@@ -1,4 +1,4 @@
-package com.ck_telecom.d22434.criminal_note;
+package com.ckt.criminal_note;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

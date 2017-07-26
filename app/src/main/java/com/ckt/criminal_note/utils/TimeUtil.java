@@ -1,4 +1,4 @@
-package com.ck_telecom.d22434.criminal_note.utils;
+package com.ckt.criminal_note.utils;
 
 import java.text.DateFormat;
 import java.util.Date;

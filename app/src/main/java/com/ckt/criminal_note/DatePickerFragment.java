@@ -1,4 +1,4 @@
-package com.ck_telecom.d22434.criminal_note;
+package com.ckt.criminal_note;
 
 import android.app.Activity;
 import android.app.Dialog;

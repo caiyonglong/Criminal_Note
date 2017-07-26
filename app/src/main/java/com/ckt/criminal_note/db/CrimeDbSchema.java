@@ -1,4 +1,4 @@
-package com.ck_telecom.d22434.criminal_note.db;
+package com.ckt.criminal_note.db;
 
 /**
  * Created by D22434 on 2017/7/24.

@@ -4,4 +4,4 @@
     android:id="@+id/fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.ck_telecom.d22434.criminal_note.CrimeActivity" />
+    tools:context="com.ckt.criminal_note.CrimeActivity" />

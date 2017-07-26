@@ -1,10 +1,10 @@
-package com.ck_telecom.d22434.criminal_note.db;
+package com.ckt.criminal_note.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.ck_telecom.d22434.criminal_note.db.CrimeDbSchema.CrimeTable;
+import com.ckt.criminal_note.db.CrimeDbSchema.CrimeTable;
 
 /**
  * Created by D22434 on 2017/7/24.
