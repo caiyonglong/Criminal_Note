@@ -31,6 +31,8 @@ public class TimePickerFragment extends DialogFragment {
     private static final String ARG_TIME = "time";
     private TimePicker mTimePicker;
 
+    Date newDate;
+
     //获取传递的crime日期
     public static TimePickerFragment newInstance(Date date) {
 
@@ -68,11 +70,10 @@ public class TimePickerFragment extends DialogFragment {
             mTimePicker.setCurrentHour(hour);
             mTimePicker.setCurrentMinute(minute);
         }
-
         mTimePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                Date newDate = new GregorianCalendar(year, month, day, hourOfDay, minute).getTime();
+                newDate = new GregorianCalendar(year, month, day, hourOfDay, minute).getTime();
 
             }
         });
@@ -84,7 +85,7 @@ public class TimePickerFragment extends DialogFragment {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                sendResult(Activity.RESULT_OK, date1);
+                                sendResult(Activity.RESULT_OK, newDate);
                             }
                         })
                 .create();
