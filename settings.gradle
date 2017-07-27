@@ -1,1 +1,1 @@
-include ':app', ':beatbox'
+include ':app', ':beatbox', ':nearlauncher'
