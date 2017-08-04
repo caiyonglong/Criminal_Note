@@ -7,7 +7,7 @@
         <item name="colorPrimaryDark">@color/dark_red</item>
         <item name="colorAccent">@color/gray</item>
 
-        <item name="android:windowBackground">@color/soothing_blue</item>
+        <item name="android:windowBackground">@color/gray</item>
         <item name="buttonStyle">@style/BeatBoxButton</item>
     </style>
 

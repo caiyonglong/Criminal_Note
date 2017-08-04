@@ -16,6 +16,7 @@ import java.util.List;
  */
 
 public class BeatBox {
+
     private static final String TAG = "BeatBox";
     private static final String SOUNDS_FOLDER = "sample_sounds";
 
@@ -23,7 +24,7 @@ public class BeatBox {
 
     private AssetManager mAssets;
     private List<Sound> mSounds = new ArrayList<>();
-    private SoundPool mSoundPool;
+    public SoundPool mSoundPool;
 
 
     public BeatBox(Context context) {
@@ -34,13 +35,14 @@ public class BeatBox {
         loadSounds();
     }
 
-    public void play(Sound sound) {
+    public void play(Sound sound, float rate) {
         Integer soundId = sound.getmSoundId();
         if (soundId == null) {
             return;
         }
-        mSoundPool.play(soundId, 1.0f, 1.0f, 1, 0, 1.0f);
+        mSoundPool.play(soundId, 1.0f, 1.0f, 1, 0, rate);
     }
+
 
     public void release() {
         mSoundPool.release();
